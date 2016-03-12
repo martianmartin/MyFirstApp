@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="e5f32fa48a3eb2de0c987025c11b6e3864b634d9">
+        <dex dex="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\pre-dexed\debug\com.android.support-support-v4-23.2.0_e1d409e0f90d9cfe18232a4c450e9e6243a4d9dc.jar" />
+    </item>
+    <item
+        jar="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.2.0\jars\libs\internal_impl-23.2.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="6e239441500605809818997dd63b62a947195f8c">
+        <dex dex="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\pre-dexed\debug\internal_impl-23.2.0_fce460c1053daccb0744f44fbfd0fac004df0551.jar" />
+    </item>
+    <item
+        jar="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\23.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="8c108c22c99e794eff255bb34d2a461200c4cbb0">
+        <dex dex="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\pre-dexed\debug\com.android.support-animated-vector-drawable-23.2.0_6bc964849110fc36561751e505b19a0ee90b382f.jar" />
+    </item>
+    <item
+        jar="C:\Users\marzipan\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.2.0\support-annotations-23.2.0.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="c5bf571bb10462bd90e5419ade67793f71acbc87">
+        <dex dex="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\pre-dexed\debug\support-annotations-23.2.0_1fcf2a620303372a22f2a74f4250addf341f520d.jar" />
+    </item>
+    <item
+        jar="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="6e3578f92f7462d1a935a1d36173e3bdd1234976">
+        <dex dex="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-23.2.0_085c3b5f21d553848145ad77bb9f0a0b5a75c837.jar" />
+    </item>
+    <item
+        jar="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\23.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="292a9fa091757208efa65e77eef63088247e51f3">
+        <dex dex="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-23.2.0_15df85f9f2bead0041ae63f7d8d36530c62b8724.jar" />
+    </item>
+    <item
+        jar="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\exploded-aar\com.android.support\recyclerview-v7\23.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="d4c936aa8c7d2522c82e3f1829c791d9e367f009">
+        <dex dex="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\pre-dexed\debug\com.android.support-recyclerview-v7-23.2.0_52142cf5c45c1f2acdf766e873ffac3e80047078.jar" />
+    </item>
+    <item
+        jar="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\exploded-aar\com.android.support\design\23.2.0\jars\classes.jar"
+        jumboMode="false"
+        revision="23.0.1"
+        sha1="1aa5b025efe97f5006f5be16d6ca67c6c3c0c0d8">
+        <dex dex="C:\Users\marzipan\workspace\MyFirstApp\app\build\intermediates\pre-dexed\debug\com.android.support-design-23.2.0_f53749eb15a2068456512187ebeeb8f30065271e.jar" />
+    </item>
+
+</items>

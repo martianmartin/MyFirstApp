@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">My First App</string>
+    <string name="edit_message">Enter a message</string>
+    <string name="button_send">Send</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_display_message">My Message</string>
+
+    <string name="find_opponents">Find Opponents</string>
+    <string name="preference_file_key">com.example.marzipan.myfirstapp.PREFERENCE_FILE_KEY</string>
+
+    <!-- Audio Button Strings -->
+    <string name="sound_1">1</string>
+    <string name="sound_2">2</string>
+    <string name="sound_3">3</string>
+    <string name="sound_4">4</string>
+    <string name="sound_5">5</string>
+    <string name="title_activity_find_opponent">FindOpponentActivity</string>
+</resources>
