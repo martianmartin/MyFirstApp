@@ -143,6 +143,7 @@ public class FindOpponentActivity extends AppCompatActivity {
         textView = new TextView(this);
         textView.setTextSize(10);
         textView.setText("Searching for nearby opponents...");
+        textView.setHeight(50);
         LinearLayout layout = (LinearLayout) findViewById(R.id.find_ops_content);
         layout.addView(textView);
 
@@ -211,9 +212,8 @@ public class FindOpponentActivity extends AppCompatActivity {
         else {
             mWifiStatusText.setText("WiFi Disabled");
             mToggleWifiButton.setText("Enable WiFi");
-//            mP2pStatusText.setText("P2P Disabled");
-//            mRequestPeersButton.setEnabled(false);
         }
+        //dump_peers_info();
     }
 
     @Override
@@ -257,7 +257,7 @@ public class FindOpponentActivity extends AppCompatActivity {
             ////////////////////////////////////////////////////////////////////////////////////////
             else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 
-                dump_peers_info();
+                //dump_peers_info();
 
             }
             ////////////////////////////////////////////////////////////////////////////////////////
@@ -308,7 +308,7 @@ public class FindOpponentActivity extends AppCompatActivity {
         }
 
         else {
-            dump_peers_info();
+            dump_peers_info(view);
         }
 
         // this should be populated as new peers are ready
@@ -482,21 +482,42 @@ public class FindOpponentActivity extends AppCompatActivity {
     }
 
 
-    private void dump_peers_info() {
+    private void dump_peers_info(View view) {
         if (mManager != null) {
             mManager.requestPeers(mChannel, peerListListener);
 
             if (peers.size() > 0) {
+
+                LinearLayout layout = (LinearLayout) findViewById(R.id.find_ops_content);
+
                 for (int i = 0; i < peers.size(); i++) {
+
+                    Button peerButton = new Button(this);
+                    peerButton.setTextSize(10);
+//                    peerButton.setWidth(100);
+//                    peerButton.setHeight(100);
+
                     WifiP2pDevice device = (WifiP2pDevice) peers.get(i);
-                    textView.setText("\n----------------------------");
-                    textView.append("\nAddreess: "+device.deviceAddress);
-                    textView.append("\nName: "+device.deviceName);
-                    textView.append("\nPrimary Type: "+device.primaryDeviceType);
-                    textView.append("\nSecondary Type: "+device.secondaryDeviceType);
-                    textView.append("\nStatus: "+device.status);
-                    textView.append("\nIs group owner: ");
-                    if (device.isGroupOwner())textView.append("yes");else textView.append("no");
+                    String go = device.isGroupOwner() ? "yes" : "no";
+                    peerButton.setText("Addreess: " + device.deviceAddress +
+                            "\nName: " + device.deviceName +
+                            "\nPrimary Type: " + device.primaryDeviceType +
+                            "\nStatus: " + device.status +
+                            "\nIs group owner: " + go);
+
+                    final int peer_num = i;
+
+                    peerButton.setOnClickListener(new Button.OnClickListener() {
+                        public void onClick(View v) {
+                            textView.append("Connect to peer: " + peer_num);
+                        }
+                    });
+
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+                    peerButton.setLayoutParams(params);
+
+                    layout.addView(peerButton);
+
                 }
             }
             else {
@@ -505,3 +526,8 @@ public class FindOpponentActivity extends AppCompatActivity {
         }
     }
 }
+
+
+
+
+
