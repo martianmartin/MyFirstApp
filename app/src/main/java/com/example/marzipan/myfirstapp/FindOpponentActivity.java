@@ -5,12 +5,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.AsyncTask;
@@ -264,8 +266,34 @@ public class FindOpponentActivity extends AppCompatActivity {
             ////////////////////////////////////////////////////////////////////////////////////////
             else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
 
-                // Connection state changed!  We should probably do something about
-                // that.
+                WifiP2pInfo p2p_info = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_INFO);
+                NetworkInfo net_info = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
+                //WifiP2pGroup group_info = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_GROUP);
+
+                if(net_info.isConnected()) {
+                    textView.setText("You are connected!");
+                }
+                else {
+                    textView.setText(("You are not connected"));
+                }
+
+                if (p2p_info.groupFormed) {
+                    textView.append("...group successfully formed");
+                }
+                else {
+                    textView.append("...group not formed");
+                }
+
+                //TODO simply expose all of the available field in a fragment
+
+                // Clear LAYOUT_peer_buttons and replace with connection controls
+                LinearLayout peer_layout = (LinearLayout) findViewById(R.id.LAYOUT_peer_buttons);
+                peer_layout.removeAllViews();
+
+                textView.append("cleared!");
+
+                // Establish socket connection with owner as host
+
 
             }
             ////////////////////////////////////////////////////////////////////////////////////////
@@ -488,7 +516,7 @@ public class FindOpponentActivity extends AppCompatActivity {
 
             if (peers.size() > 0) {
 
-                LinearLayout layout = (LinearLayout) findViewById(R.id.find_ops_content);
+                LinearLayout layout = (LinearLayout) findViewById(R.id.LAYOUT_peer_buttons);
 
                 for (int i = 0; i < peers.size(); i++) {
 
