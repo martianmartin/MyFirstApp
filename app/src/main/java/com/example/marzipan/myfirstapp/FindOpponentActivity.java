@@ -89,12 +89,12 @@ public class FindOpponentActivity extends AppCompatActivity {
     };
 
     // called when a new peer is available to connect to
-    public void connect() {
+    public void connect(String dev_address) {
         // Picking the first device found on the network.
         WifiP2pDevice device = (WifiP2pDevice) peers.get(0);
 
         WifiP2pConfig config = new WifiP2pConfig();
-        config.deviceAddress = device.deviceAddress;
+        config.deviceAddress = dev_address;
         config.wps.setup = WpsInfo.PBC;
 
         mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
@@ -102,20 +102,21 @@ public class FindOpponentActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
-                textView.append("Connected!");
+                textView.append("...Connected!");
 
                 mManager.requestConnectionInfo(mChannel, new WifiP2pManager.ConnectionInfoListener() {
 
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
                         thisConnInfo = info;
-                        if (info.groupOwnerAddress != null) {
-                            textView.append("go: " + info.groupOwnerAddress.getHostAddress());
-                            if (info.isGroupOwner) textView.append("_is owner_");
-                            else textView.append("_is not owner_");
-                            hostAddress = info.groupOwnerAddress.getHostAddress();
-                        } else {
-                            textView.append("no group info yet...");
-                        }
+
+//                        if (info.groupOwnerAddress != null) {
+//                            textView.append("go: " + info.groupOwnerAddress.getHostAddress());
+//                            if (info.isGroupOwner) textView.append("_is owner_");
+//                            else textView.append("_is not owner_");
+//                            hostAddress = info.groupOwnerAddress.getHostAddress();
+//                        } else {
+//                            textView.append("no group info yet...");
+//                        }
                     }
 
                     ;
@@ -125,7 +126,7 @@ public class FindOpponentActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(int reason) {
-                textView.append("failed to connect!");
+                textView.append("...failed to connect!");
             }
         });
     }
@@ -481,7 +482,6 @@ public class FindOpponentActivity extends AppCompatActivity {
         }
     }
 
-
     private void dump_peers_info(View view) {
         if (mManager != null) {
             mManager.requestPeers(mChannel, peerListListener);
@@ -494,8 +494,6 @@ public class FindOpponentActivity extends AppCompatActivity {
 
                     Button peerButton = new Button(this);
                     peerButton.setTextSize(10);
-//                    peerButton.setWidth(100);
-//                    peerButton.setHeight(100);
 
                     WifiP2pDevice device = (WifiP2pDevice) peers.get(i);
                     String go = device.isGroupOwner() ? "yes" : "no";
@@ -507,9 +505,13 @@ public class FindOpponentActivity extends AppCompatActivity {
 
                     final int peer_num = i;
 
+                    final WifiP2pConfig config = new WifiP2pConfig();
+                    final String dev_address = device.deviceAddress;
+
                     peerButton.setOnClickListener(new Button.OnClickListener() {
                         public void onClick(View v) {
-                            textView.append("Connect to peer: " + peer_num);
+                            textView.setText("Connecting to peer: " + peer_num);
+                            connect(dev_address);
                         }
                     });
 
