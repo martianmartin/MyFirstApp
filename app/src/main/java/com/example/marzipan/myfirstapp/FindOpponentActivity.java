@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -21,6 +22,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -62,9 +65,16 @@ public class FindOpponentActivity extends AppCompatActivity {
     String hostAddress;
     ServerSocket serverSocket;
     String tcp_input;
+    WifiManager wifiManager;
     Boolean tcp_accepted = false;
     Boolean tcp_started = false;
     WifiP2pInfo thisConnInfo;
+    EditText mP2pStatusText;
+    EditText mWifiStatusText;
+    Button mToggleWifiButton;
+    Button mRequestPeersButton;
+    Boolean Peer_disco_initiated = false;
+
     // peerListListener is used as argument to mManager.requestPeers, defines what to do with updated peerlist
     private WifiP2pManager.PeerListListener peerListListener = new WifiP2pManager.PeerListListener() {
 
@@ -127,14 +137,7 @@ public class FindOpponentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_find_opponent);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         Intent intent = getIntent();
         textView = new TextView(this);
@@ -142,6 +145,12 @@ public class FindOpponentActivity extends AppCompatActivity {
         textView.setText("Searching for nearby opponents...");
         LinearLayout layout = (LinearLayout) findViewById(R.id.find_ops_content);
         layout.addView(textView);
+
+        mP2pStatusText = (EditText) findViewById(R.id.TEXT_p2p_status);
+        mToggleWifiButton = (Button) findViewById(R.id.BUTTON_toggle_wifi);
+        mRequestPeersButton = (Button) findViewById(R.id.BUTTON_request_peers);
+        mWifiStatusText = (EditText) findViewById(R.id.TEXT_wifi_status);
+
 
         //  Indicates a change in the Wi-Fi P2P status.
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
@@ -156,6 +165,7 @@ public class FindOpponentActivity extends AppCompatActivity {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        wifiManager = (WifiManager)this.getSystemService(Context.WIFI_SERVICE);
         // This must be the first WiFi p2p method called before any other operations
         mChannel = mManager.initialize(this, getMainLooper(), null);
         // handles android wifi intents
@@ -192,6 +202,18 @@ public class FindOpponentActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();
         registerReceiver(receiver, intentFilter);
+
+        //  update based on wifi status
+        if (wifiManager.isWifiEnabled()) {
+            mWifiStatusText.setText("WiFi Enabled");
+            mToggleWifiButton.setText("Disable WiFi");
+        }
+        else {
+            mWifiStatusText.setText("WiFi Disabled");
+            mToggleWifiButton.setText("Enable WiFi");
+//            mP2pStatusText.setText("P2P Disabled");
+//            mRequestPeersButton.setEnabled(false);
+        }
     }
 
     @Override
@@ -220,27 +242,22 @@ public class FindOpponentActivity extends AppCompatActivity {
             if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
                 // Determine if Wifi P2P mode is enabled or not, alert
                 // the Activity.
+
                 int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
                 if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
-                    textView.append("P2P enabled");
+                    mP2pStatusText.setText("P2P Enabled");
+                    mRequestPeersButton.setEnabled(true);
+
                 } else {
-                    textView.append("P2P disabled");
+                    mP2pStatusText.setText("P2P Disabled");
+                    mRequestPeersButton.setEnabled(false);
                 }
+
             }
             ////////////////////////////////////////////////////////////////////////////////////////
             else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 
-                // Request available peers from the wifi p2p manager. This is an
-                // asynchronous call and the calling activity is notified with a
-                // callback on PeerListListener.onPeersAvailable()
-                if (this.thisManager != null) {
-                    this.thisManager.requestPeers(this.thisChannel, peerListListener);
-                }
-
-                textView.append("pc: ");
-                Integer numPeers = peers.size();
-                textView.append(numPeers.toString());
-
+                dump_peers_info();
 
             }
             ////////////////////////////////////////////////////////////////////////////////////////
@@ -264,18 +281,48 @@ public class FindOpponentActivity extends AppCompatActivity {
 
     public void request_peers(View view) {
         // get a print channel properties, this should update peers
-        mManager.requestPeers(mChannel, peerListListener);
-        textView.append("pc: ");
-        Integer numPeers = peers.size();
-        textView.append(numPeers.toString());
-        if (numPeers > 0) {
-            WifiP2pDevice device = (WifiP2pDevice) peers.get(0);
-            textView.append("name: " + device.deviceName);
-            String myIP = getDottedDecimalIP(getLocalIPAddress());
-            textView.append("myIP: " + myIP);
+        // may not want to be calling this repeatadly ? probably doesnt hurt
 
-            connect();
+        if(Peer_disco_initiated) {
+
+            mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
+
+                @Override
+                public void onSuccess() {
+                    // Code for when the discovery initiation is successful goes here.
+                    // No services have actually been discovered yet, so this method
+                    // can often be left blank.  Code for peer discovery goes in the
+                    // onReceive method, detailed below.
+                    textView.append("Initialized P2P, fetching peer info...");
+                    Peer_disco_initiated = true;
+                }
+
+                @Override
+                public void onFailure(int reasonCode) {
+                    // Code for when the discovery initiation fails goes here.
+                    // Alert the user that something went wrong.
+                    textView.append("P2P initialization failed: " + reasonCode);
+                }
+            });
+
         }
+
+        else {
+            dump_peers_info();
+        }
+
+        // this should be populated as new peers are ready
+//        if (numPeers > 0) {
+//            WifiP2pDevice device = (WifiP2pDevice) peers.get(0);
+//            textView.append("name: " + device.deviceName);
+//            String myIP = getDottedDecimalIP(getLocalIPAddress());
+//            textView.append("myIP: " + myIP);
+//
+//            connect();
+//        }
+
+
+
     }
 
     public void start_server(View view) {
@@ -420,4 +467,41 @@ public class FindOpponentActivity extends AppCompatActivity {
         if (tcp_accepted)textView.append("ACCEPTED!"); else {textView.append("NOT accepted!");}
     }
 
+    public void toggle_wifi(View view) {
+
+        if (wifiManager.isWifiEnabled()) {
+            wifiManager.setWifiEnabled(false);
+            mToggleWifiButton.setText("Enable WiFi");
+            mWifiStatusText.setText("WiFi Disabled");
+        }
+        else {
+            wifiManager.setWifiEnabled(true);
+            mToggleWifiButton.setText("Disable WiFi");
+            mWifiStatusText.setText("WiFi Disabled");
+        }
+    }
+
+
+    private void dump_peers_info() {
+        if (mManager != null) {
+            mManager.requestPeers(mChannel, peerListListener);
+
+            if (peers.size() > 0) {
+                for (int i = 0; i < peers.size(); i++) {
+                    WifiP2pDevice device = (WifiP2pDevice) peers.get(i);
+                    textView.setText("\n----------------------------");
+                    textView.append("\nAddreess: "+device.deviceAddress);
+                    textView.append("\nName: "+device.deviceName);
+                    textView.append("\nPrimary Type: "+device.primaryDeviceType);
+                    textView.append("\nSecondary Type: "+device.secondaryDeviceType);
+                    textView.append("\nStatus: "+device.status);
+                    textView.append("\nIs group owner: ");
+                    if (device.isGroupOwner())textView.append("yes");else textView.append("no");
+                }
+            }
+            else {
+                textView.setText("_NPF_");
+            }
+        }
+    }
 }
